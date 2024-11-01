@@ -15,45 +15,40 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def playlist_input():
-    # Clear the screen
-    clear_screen()
+    while True:
+        # Clear the screen
+        clear_screen()
 
-    # Get the playlist URL from the user
-    playlist_url = input("Enter the playlist URL: ")
-    
-    # Extract the playlist ID from the URL
-    if 'playlist' in playlist_url:
-        playlist_id = playlist_url.split('playlist/')[1].split('?')[0]
-    else:
-        print("Invalid playlist URL. Please try again.")
-        return
-    
-    print("Playlist ID:", playlist_id)
-    new_or_recommend(playlist_id)
+        # Get the playlist URL from the user
+        playlist_url = input("Enter the playlist URL: ")
+        
+        # Extract the playlist ID from the URL
+        if 'playlist' in playlist_url:
+            playlist_id = playlist_url.split('playlist/')[1].split('?')[0]
+            return playlist_id
+        else:
+            print("Invalid playlist URL. Please try again.")
 
 def new_or_recommend(playlist_id):
-    # Clear the screen
-    clear_screen()
-
-    # Get the token info from the file
-    with open('token_info.json', 'r') as f:
-        token_info = json.load(f)
-
-    # Create a Spotipy instance with the access token
-    sp = spotipy.Spotify(auth=token_info['access_token'])
-
-    # Fetch the playlist details
-    playlist_details = sp.playlist(playlist_id)
-
-    # Extract the playlist name
-    playlist_name = playlist_details['name']
-
-    # Display the playlist name
-    print("Playlist Name:", playlist_name)
-
-    # Ask the user if they want to generate a new playlist or recommend songs
     while True:
-        print("The selected playlist is: ", playlist_id)
+        # Clear the screen
+        clear_screen()
+
+        # Get the token info from the file
+        with open('token_info.json', 'r') as f:
+            token_info = json.load(f)
+
+        # Create a Spotipy instance with the access token
+        sp = spotipy.Spotify(auth=token_info['access_token'])
+
+        # Fetch the playlist details
+        playlist_details = sp.playlist(playlist_id)
+
+        # Extract the playlist name
+        playlist_name = playlist_details['name']
+
+        # Display the options
+        print("The selected playlist is:", playlist_name)
         print("1. Select new playlist")
         print("2. Recommend Songs")
         print("3. Quit")
@@ -61,15 +56,14 @@ def new_or_recommend(playlist_id):
         choice = input("Enter your choice: ")
 
         if choice == '1':
-            playlist_input()
+            return None  # Indicate that we need to select a new playlist
         elif choice == '2':
             recommend_songs(playlist_id)
         elif choice == '3':
             print("Harmonize next time!")
-            break
+            return 'quit'
         else:
             print("Invalid input. Please try again.")
-
 
 def recommend_songs(playlist_id):
     # Clear the console screen
@@ -127,26 +121,8 @@ def recommend_songs(playlist_id):
     for idx, track in enumerate(recommendations['tracks']):
         print(f"{idx + 1}. {track['name']} by {track['artists'][0]['name']}")
 
-# TEST FUNCTION
-# def user_top_5_songs():
-#     try:
-#         # Read the token info from the file
-#         with open('token_info.json', 'r') as f:
-#             token_info = json.load(f)
-#     except FileNotFoundError:
-#         print('User not logged in')
-#         return
-
-#     # Create a Spotipy instance with the access token
-#     sp = spotipy.Spotify(auth=token_info['access_token'])
-
-#     # Get the user's top tracks
-#     top_tracks = sp.current_user_top_tracks(limit=5)['items']
-
-#     # Display the top 5 tracks
-#     print("Your Top 5 Songs:")
-#     for idx, track in enumerate(top_tracks):
-#         print(f"{idx + 1}. {track['name']} by {track['artists'][0]['name']}")
+    # Continue?
+    input("Press Enter to continue...")
 
 def main():
     # Clear the console screen
@@ -178,8 +154,12 @@ def main():
             clear_screen()
 
             # Start the meat of the program
-            playlist_input()
-            
+            while True:
+                playlist_id = playlist_input()
+                if playlist_id:
+                    result = new_or_recommend(playlist_id)
+                    if result == 'quit':
+                        break
         elif choice == '2':
             print("Harmonize next time!")
             break
