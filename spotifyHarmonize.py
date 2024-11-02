@@ -32,7 +32,13 @@ def playlist_input():
         clear_screen()
 
         # Get the playlist URL from the user
+        print("Please paste your playlist URL.")
+        print("Ensure that your account has access to this playlist, as the program will attempt to access songs from it.")
+        print("You may also enter 'q' to quit.\n")
         playlist_url = input("Enter the playlist URL: ")
+        
+        if playlist_url.lower() == 'q':
+            return 'quit'
         
         # Extract the playlist ID from the URL
         if 'playlist' in playlist_url:
@@ -41,7 +47,7 @@ def playlist_input():
         else:
             print("Invalid playlist URL. Please try again.")
 
-def new_or_recommend(playlist_id):
+def new_or_recommend(playlist_id):    
     while True:
         # Clear the screen
         clear_screen()
@@ -58,6 +64,9 @@ def new_or_recommend(playlist_id):
 
         # Extract the playlist name
         playlist_name = playlist_details['name']
+
+        # Explanation
+        print("You can choose to select a different playlist to recommend songs from,\nor recommend songs based on your currently selected playlist.\n")
 
         # Display the options
         print("The selected playlist is:", playlist_name)
@@ -133,7 +142,7 @@ def recommend_songs(playlist_id):
         print(f"{idx + 1}. {track['name']} by {track['artists'][0]['name']}")
 
     # Continue?
-    input("Press Enter to continue...")
+    input("\nPress Enter to continue...")
 
 def main():
     # Clear the console screen
@@ -171,6 +180,8 @@ def main():
             # Start the meat of the program
             while True:
                 playlist_id = playlist_input()
+                if playlist_id == 'quit':
+                    break
                 if playlist_id:
                     result = new_or_recommend(playlist_id)
                     if result == 'quit':
@@ -183,10 +194,7 @@ def main():
             print("Invalid input. Please try again.")
     
     if os.path.exists('token_info.json'):
-        try:
             os.remove('token_info.json')
-        except Exception as e:
-            print(f"Error removing token_info.json: {e}")
 
     print("Harmonize next time!")
     
