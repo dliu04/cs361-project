@@ -3,7 +3,7 @@ import authorize
 import threading
 import webbrowser
 import time
-import requests
+import sys
 import spotipy
 import json
 
@@ -13,6 +13,18 @@ def run_flask():
 def clear_screen():
     # Clear the console screen
     os.system('cls' if os.name == 'nt' else 'clear')
+
+def is_authorized():
+    if not os.path.exists('token_info.json'):
+        return False
+
+    with open('token_info.json', 'r') as f:
+        token_info = json.load(f)
+
+    if 'access_token' not in token_info:
+        return False
+
+    return True
 
 def playlist_input():
     while True:
@@ -60,7 +72,6 @@ def new_or_recommend(playlist_id):
         elif choice == '2':
             recommend_songs(playlist_id)
         elif choice == '3':
-            print("Harmonize next time!")
             return 'quit'
         else:
             print("Invalid input. Please try again.")
@@ -145,10 +156,14 @@ def main():
             flask_thread.start()
 
             # Wait a moment for the server to start
-            time.sleep(2)
+            time.sleep(1)
 
             # Open the Spotify login page
             webbrowser.open("http://127.0.0.1:5000")
+
+            # Wait until the user is authorized
+            while not is_authorized():
+                time.sleep(0.1)
 
             time.sleep(1)
             clear_screen()
@@ -159,12 +174,22 @@ def main():
                 if playlist_id:
                     result = new_or_recommend(playlist_id)
                     if result == 'quit':
-                        break
+                        break 
+            break
+
         elif choice == '2':
-            print("Harmonize next time!")
             break
         else:
             print("Invalid input. Please try again.")
+    
+    if os.path.exists('token_info.json'):
+        try:
+            os.remove('token_info.json')
+        except Exception as e:
+            print(f"Error removing token_info.json: {e}")
+
+    print("Harmonize next time!")
+    
 
 if __name__ == "__main__":
     main()
