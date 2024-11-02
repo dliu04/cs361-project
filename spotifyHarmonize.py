@@ -107,7 +107,6 @@ def recommend_songs(playlist_id):
 
     # Get the audio features for the tracks
     audio_features = sp.audio_features(seed_tracks)
-
     # Extract the audio features
     features = [track for track in audio_features if track is not None]
 
@@ -136,9 +135,12 @@ def recommend_songs(playlist_id):
         target_valence=avg_features.get('valence', 0)
     )
 
+    # Filter out tracks that are already in the playlist
+    recommended_tracks = [track for track in recommendations['tracks'] if track['id'] not in track_ids]
+
     # Display the recommended tracks
     print("Recommended Songs:")
-    for idx, track in enumerate(recommendations['tracks']):
+    for idx, track in enumerate(recommended_tracks):
         print(f"{idx + 1}. {track['name']} by {track['artists'][0]['name']}")
 
     # Continue?
