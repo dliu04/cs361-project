@@ -7,6 +7,7 @@ import requests
 import spotipy
 import json
 
+
 def run_flask():
     authorize.app.run(port=5000)
 
@@ -163,6 +164,16 @@ def recommend_songs(playlist_id):
     
     input("\nPress Enter to continue...")
 
+# To clean up temporary files
+import atexit
+import shutil
+
+def cleanup():
+    # List of folders to delete
+    temp_folders = ['__pycache__', 'flask_session']
+    for folder in temp_folders:
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
 
 def main():
     # Clear the console screen
@@ -218,6 +229,7 @@ def main():
 
     print("Harmonize next time!")
     
+atexit.register(cleanup)
 
 if __name__ == "__main__":
     main()
