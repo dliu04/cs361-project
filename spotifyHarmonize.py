@@ -119,7 +119,7 @@ def recommend_songs(playlist_id):
     # Get the recommended tracks based on the average audio features
     recommendations = sp.recommendations(
         seed_tracks=seed_tracks, 
-        limit=10, 
+        limit=99, 
         target_acousticness=avg_features.get('acousticness', 0),
         target_danceability=avg_features.get('danceability', 0),
         target_energy=avg_features.get('energy', 0),
@@ -226,6 +226,9 @@ def main():
     
     if os.path.exists('token_info.json'):
             os.remove('token_info.json')
+    
+    if os.path.exists('.cache'):
+        os.remove('.cache')
 
     print("Harmonize next time!")
     
