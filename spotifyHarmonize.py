@@ -164,6 +164,79 @@ def recommend_songs(playlist_id):
     
     input("\nPress Enter to continue...")
 
+def recommend_songs_from_top_tracks():
+    # Clear the console screen
+    clear_screen()
+    # Get the token info from the file
+    with open('token_info.json', 'r') as f:
+        token_info = json.load(f)
+    # Create a Spotipy instance with the access token
+    sp = spotipy.Spotify(auth=token_info['access_token'])
+    # Get the user's top tracks for the past month
+    top_tracks = sp.current_user_top_tracks(time_range='short_term', limit=5)['items']
+    # Extract the track IDs
+    track_ids = [track['id'] for track in top_tracks]
+    # Get the audio features for the tracks
+    audio_features = sp.audio_features(track_ids)
+    # Extract the audio features
+    features = [track for track in audio_features if track is not None]
+    # Calculate the average audio features
+    avg_features = {}
+    for feature in features:
+        for key, value in feature.items():
+            if isinstance(value, (int, float)):  # Ensure the value is numeric
+                if key in avg_features:
+                    avg_features[key] += value
+                else:
+                    avg_features[key] = value
+    for key in avg_features:
+        avg_features[key] /= len(features)
+    # Get the recommended tracks based on the average audio features
+    recommended_tracks = sp.recommendations(
+        seed_tracks=track_ids, 
+        limit=99, 
+        target_acousticness=avg_features.get('acousticness', 0),
+        target_danceability=avg_features.get('danceability', 0),
+        target_energy=avg_features.get('energy', 0),
+        target_instrumentalness=avg_features.get('instrumentalness', 0),
+        target_liveness=avg_features.get('liveness', 0),
+        target_valence=avg_features.get('valence', 0)
+    )['tracks']
+    # Display the recommended tracks
+    print("Recommended Songs:")
+    for idx, track in enumerate(recommended_tracks):
+        print(f"{idx + 1}. {track['name']} by {track['artists'][0]['name']}")
+    
+    ### Save the recommended tracks to a new playlist
+
+    # Get user input
+    print("\nWould you like to save the recommended songs to a new playlist?")
+    print("1. Yes")
+    print("2. No")
+    choice = input("Enter your choice: ")
+
+    if choice == '1':
+        # Clear the screen
+        clear_screen()
+        # Send the recommended tracks to the microservice
+        playlist_name = input("Enter the name of the new playlist: ")
+        track_ids = [track['id'] for track in recommended_tracks]
+        response = requests.post("http://127.0.0.1:5001/save_playlist", json={
+            "token_info": token_info,
+            "playlist_name": playlist_name,
+            "track_ids": track_ids
+        })
+        if response.status_code == 200:
+            print("Playlist saved successfully!")
+        else:
+            print("Failed to save playlist.")
+    elif choice == '2':
+        pass
+    else:
+        print("Invalid input!")
+    
+    input("\nPress Enter to continue...")
+
 # To clean up temporary files
 import atexit
 import shutil
@@ -208,15 +281,21 @@ def main():
             time.sleep(1)
             clear_screen()
 
-            # Start the meat of the program
-            while True:
-                playlist_id = playlist_input()
-                if playlist_id == 'quit':
-                    break
-                if playlist_id:
-                    result = new_or_recommend(playlist_id)
-                    if result == 'quit':
-                        break 
+            print("What would you like to do?")
+            print("1. Recommend songs based on a playlist")
+            print("2. Recommend songs based on top five songs in the past month")
+            recommendChoice = input("Enter your choice: ")
+            if recommendChoice == '1':
+                while True:
+                    playlist_id = playlist_input()
+                    if playlist_id == 'quit':
+                        break
+                    if playlist_id:
+                        result = new_or_recommend(playlist_id)
+                        if result == 'quit':
+                            break 
+            elif recommendChoice == '2':
+                recommend_songs_from_top_tracks()
             break
 
         elif choice == '2':

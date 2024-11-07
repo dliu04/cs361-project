@@ -69,7 +69,7 @@ def create_spotify_oauth():
         client_id='e3ee009e9bc04a5dbb8f9a62a6d6f923',
         client_secret='7be4c70da1944a92818d3ef2291c9afc',
         redirect_uri=url_for('redirect_page', _external=True),
-        scope='user-library-read playlist-modify-public playlist-modify-private'
+        scope='user-library-read user-top-read playlist-modify-public playlist-modify-private'
     )
 
 if __name__ == "__main__":
