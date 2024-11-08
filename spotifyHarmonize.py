@@ -173,7 +173,11 @@ def recommend_songs_from_top_tracks():
     # Create a Spotipy instance with the access token
     sp = spotipy.Spotify(auth=token_info['access_token'])
     # Get the user's top tracks for the past month
-    top_tracks = sp.current_user_top_tracks(time_range='short_term', limit=5)['items']
+    top_tracks = sp.current_user_top_tracks(time_range='short_term', limit=5)['items'] # short_term (4 weeks), medium_term (6 months), long_term (past year)
+    # List the user's top tracks:
+    print("Your top tracks for the past month:")
+    for idx, track in enumerate(top_tracks):
+        print(f"{idx + 1}. {track['name']} by {track['artists'][0]['name']}")
     # Extract the track IDs
     track_ids = [track['id'] for track in top_tracks]
     # Get the audio features for the tracks
@@ -194,7 +198,7 @@ def recommend_songs_from_top_tracks():
     # Get the recommended tracks based on the average audio features
     recommended_tracks = sp.recommendations(
         seed_tracks=track_ids, 
-        limit=99, 
+        limit=10, 
         target_acousticness=avg_features.get('acousticness', 0),
         target_danceability=avg_features.get('danceability', 0),
         target_energy=avg_features.get('energy', 0),
