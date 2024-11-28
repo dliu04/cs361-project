@@ -107,8 +107,11 @@ def recommend_based_on_playlist():
             if result == 'quit':
                 break
 
-def recommend_based_on_top_five():
+def recommend_based_on_time_frame():
     seed_tracks = get_top_tracks()
+    print("Recommending songs now!")
+    print("enter to continue...")
+    input()
     recommend_songs(seed_tracks)
 
 def main():
@@ -116,14 +119,16 @@ def main():
     clear_screen()
 
     while True:
-        print("Welcome to Spotify Harmonize!")
-        print("This software will generate a recommended playlist inspired by a playlist of your choosing.")
-        print("Please ensure the intended playlists are public before you begin.")
-        print("\n")
-        print("1. Login to Spotify")
-        print("2. Quit")
+        # print("Welcome to Spotify Harmonize!")
+        # print("This software will generate a recommended playlist inspired by a playlist of your choosing.")
+        # print("Please ensure the intended playlists are public before you begin.")
+        # print("\n")
+        # print("1. Login to Spotify")
+        # print("2. Quit")
 
-        choice = input("Enter your choice: ")
+        # choice = input("Enter your choice: ")
+
+        choice = '1'
 
         if choice == '1':
             # Start the Flask app in a new thread
@@ -146,12 +151,12 @@ def main():
 
             print("What would you like to do?")
             print("1. Recommend songs based on a playlist")
-            print("2. Recommend songs based on top five songs in the past month")
+            print("2. Recommend songs based on top five songs in a selected time frame")
             recommendChoice = input("Enter your choice: ")
             if recommendChoice == '1':
                 recommend_based_on_playlist()
             elif recommendChoice == '2':
-                recommend_based_on_top_five()
+                recommend_based_on_time_frame()
             break
         elif choice == '2':
             break
