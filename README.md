@@ -1,7 +1,7 @@
-# cs361-main
+# Software Engineering 1 Final Project
 Main repository for my CS361 Software Engineering Project.
 
 
-Task list:
-1. Allow users to select a time frame in which to recommend songs
-2. Playlist detoxify option (tinder but for songs in their playlist)
+Notes:
+This project used to work before [Spotify changed their API](https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api). I am so sad that I have to pivot.
+I will have to mock all API calls and return fake data. Don't expect this program to actually be useful.
